@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import {Row, Col, Button, Container, Form } from "react-bootstrap";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Button from 'react-bootstrap/Button';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import Select from "react-select";
 import axios from 'axios';
 import {DisplaySearch} from './DisplaySearch';
@@ -60,8 +64,6 @@ export default function SearchForm() {
 
         try {
             setDisplayLoding(true);
-
-            // document.getElementById("result-container").innerHTML = "";
             const result = await axios.post(
                 'https://localhost:7295/IrctcSearch',  
                 {

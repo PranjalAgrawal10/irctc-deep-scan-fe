@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
-import { Card, Button, Row, Col } from 'react-bootstrap';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner'
 

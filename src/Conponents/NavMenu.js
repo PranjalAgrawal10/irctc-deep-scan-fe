@@ -1,12 +1,12 @@
 import React from 'react';
-// import './NavMenu.css';
-import {Navbar, Nav} from 'react-bootstrap'
+import Navbar from 'react-bootstrap/Navbar'
+import Nav from 'react-bootstrap/Nav'
 
 export default function NavMenu() {
 
 
     return (
-      <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3 mx-3" container light>
+      <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3 mx-3">
         <Navbar.Brand> 
           <a href="/" className="nav-link">Deep Scan Train</a>
         </Navbar.Brand>

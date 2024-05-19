@@ -1,6 +1,6 @@
 import React from 'react';
 import TrainCard from './TrainCard';
-import { Container } from 'react-bootstrap';
+import Container from 'react-bootstrap/Container';
 import LoadingSpinner from './LoadingSpinner';
 
 export function DisplaySearch({trainInfo, QuotaCode, DepartureDate, displayLoding, isSearchPage }){
@@ -8,8 +8,7 @@ export function DisplaySearch({trainInfo, QuotaCode, DepartureDate, displayLodin
     return(
         <Container >
             {displayLoding ? <LoadingSpinner/> : <></>}
-            {
-            isSearchPage ? 
+            { isSearchPage ? 
                 trainInfo.trainBtwnStnsList.map( (train) => (
                     <TrainCard key={train.trainNumber} train={train} QuotaCode={QuotaCode} DepartureDate={DepartureDate} isNewRequest={true}/>
                 )) :
