@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import {Row, Col, Button, Container, Form } from "react-bootstrap";
 import Select from "react-select";
 import axios from 'axios';
-import DisplaySearch from './DisplaySearch';
-
+import {DisplaySearch} from './DisplaySearch';
 
 export default function SearchForm() {
 
@@ -27,7 +26,7 @@ export default function SearchForm() {
     const [ToCode, setToCode] = useState("");
     const [DepartureDate, setDepartureDate] = useState("");
     const [QuotaCode, setQuotaCode] = useState({ value: 'GN', label: 'General' });
-
+    const [displayLoding, setDisplayLoding] = useState(false)
 
 
     async function handelOnInputChange(inp) {
@@ -57,7 +56,12 @@ export default function SearchForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+
         try {
+            setDisplayLoding(true);
+
+            // document.getElementById("result-container").innerHTML = "";
             const result = await axios.post(
                 'https://localhost:7295/IrctcSearch',  
                 {
@@ -78,20 +82,22 @@ export default function SearchForm() {
             });
             setResponse(result.data);
             setIsSearchPage(true);
+            setDisplayLoding(false);
             // console.log(result.data)
         } catch (error) {
+            setDisplayLoding(false);
             console.error('Error posting data', error);
         }
     };
     
 
     return (
-        <>
-            <Container>
+        <Container>
+            <Container className='my-2 px-3 pt-2 pb-3 bg-secondary' style={{borderRadius: "5px"}}>
                 <Form onSubmit={handleSubmit}>
                     {
                         isSearchPage ? 
-                        <Row className='d-flex flex-row' md={5} sm={5} lg={5}>
+                        <Row className='d-flex flex-row' md={5} sm={2} lg={5}>
                             <FromTo fromCode={fromCode} ToCode={ToCode} StationOptions={StationOptions} setfromCode={setfromCode} handelOnInputChange={handelOnInputChange} setToCode={setToCode}/>
                             <DateQuota DepartureDate={DepartureDate} setDepartureDate={setDepartureDate} QuotaCode={QuotaCode} QuotaOptions={QuotaOptions} setQuotaCode={setQuotaCode}/>
                             <div className='d-flex flex-column'>
@@ -99,7 +105,7 @@ export default function SearchForm() {
                                 <Button type="submit">Search</Button>
                             </div>
                         </Row> :
-                        <div>
+                        <Row>
                             <Row xs={2} sm={6} md={12} lg={16} className="justify-content-center my-3" style={{width:"100%"}}>
                                 <FromTo fromCode={fromCode} ToCode={ToCode} StationOptions={StationOptions} setfromCode={setfromCode} handelOnInputChange={handelOnInputChange} setToCode={setToCode}/>
                             </Row >
@@ -107,15 +113,16 @@ export default function SearchForm() {
                                 <DateQuota DepartureDate={DepartureDate} setDepartureDate={setDepartureDate} QuotaCode={QuotaCode} QuotaOptions={QuotaOptions} setQuotaCode={setQuotaCode}/>
                             </Row>
                             <Row xs={1} sm={3} md={6} lg={8} style={{width:"100%"}} className="justify-content-center my-3">
-                                <Button type="submit">Search</Button>
+                                <Button variant={!displayLoding ? "primary" : "dark"} type="submit" disabled={displayLoding}>Search</Button>
                             </Row>
-                        </div> 
+                        </Row> 
                     }
                 </Form>
-
             </Container>
-            {isSearchPage ?  <DisplaySearch trainInfo={response} QuotaCode={QuotaCode} DepartureDate={DepartureDate}/> : <></> }
-        </>
+
+            <DisplaySearch trainInfo={response} QuotaCode={QuotaCode} DepartureDate={DepartureDate} displayLoding={displayLoding} isSearchPage={isSearchPage}/>
+            
+        </Container>
     );
 }
 
@@ -126,11 +133,11 @@ function FromTo({fromCode, ToCode, StationOptions, setfromCode, handelOnInputCha
     return( 
         <>
             <Col>
-                <Form.Label> From </Form.Label>
+                <Form.Label className='text-white'> From </Form.Label>
                 <Select defaultValue={fromCode} options={StationOptions} id="from-station" onInputChange={(inp) => {handelOnInputChange(inp)}} onChange={(e) => (setfromCode(e))}/>
             </Col>
             <Col>
-                <Form.Label> To </Form.Label>
+                <Form.Label className='text-white'> To </Form.Label>
                 <Select defaultValue={ToCode}  options={StationOptions} id="to-station" onInputChange={(inp) => {handelOnInputChange(inp)}} onChange={(e) => (setToCode(e))}/>
             </Col>
         </>
@@ -143,11 +150,11 @@ function DateQuota({DepartureDate, setDepartureDate, QuotaCode, QuotaOptions, se
     return (
         <>
             <Col>
-                <Form.Label>Departure Date</Form.Label> 
+                <Form.Label className='text-white'>Departure Date</Form.Label> 
                 <Form.Control type="date" value={DepartureDate} style={{width:"100%"} } onChange={(e) => (setDepartureDate(e.target.value))}/>
             </Col>
             <Col>
-                <Form.Label> Quota </Form.Label>
+                <Form.Label className='text-white'> Quota </Form.Label>
                 <Select defaultValue={QuotaCode} options={QuotaOptions}  onChange={(e) => (setQuotaCode(e))} />
             </Col>
         </>

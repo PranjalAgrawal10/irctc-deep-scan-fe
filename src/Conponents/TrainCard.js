@@ -1,15 +1,20 @@
 import React, {useState} from 'react';
 import { Card, Button, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
+import LoadingSpinner from './LoadingSpinner'
 
-
-export default function TrainCard({train, QuotaCode, DepartureDate}){
+export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
 
     const [availCalls, setAvailCalls] = useState({});
+
+    const [displayLoding, setDisplayLoding] = useState(false)
+    const [AvailRequested, setAvailRequested] = useState(false)
 
     const handleCheckAvailavility = async (train) => {
         // e.preventDefault();
         try{
+            setDisplayLoding(true);
+            setAvailRequested(true);
             const result = await axios.post(
                 'https://localhost:7295/AvailApi',  
                 {
@@ -26,14 +31,17 @@ export default function TrainCard({train, QuotaCode, DepartureDate}){
                 }
             );
             console.log(result.data);
+            setDisplayLoding(false);
             setAvailCalls(result.data);
         } catch (error) {
+            setAvailRequested(true)
+            setDisplayLoding(false)
             console.error('Error posting data', error);
         }
     };
 
     return(
-        <Card key={train.trainNumber}>
+        <Card key={train.trainNumber} >
             <Card.Header>{train.trainNumber} - {train.trainName}</Card.Header>
             <Card.Body className='d-flex justify-content-between' >
                 <Card.Text className='my-auto'>
@@ -49,7 +57,9 @@ export default function TrainCard({train, QuotaCode, DepartureDate}){
                     </Row>        
                 </Card.Text>
                 <div className='my-auto'>
-                    <Button variant="primary" onClick={ () => (handleCheckAvailavility(train))} >Check Availability</Button>
+                    <Button variant={AvailRequested ? "secondary" : "primary" } onClick={ () => (handleCheckAvailavility(train))} disabled={AvailRequested} >
+                        {displayLoding ? <LoadingSpinner/> : "Check Availability"}
+                    </Button>
                     <Button variant="danger" >Deep Search</Button>
                 </div>
             </Card.Body>
