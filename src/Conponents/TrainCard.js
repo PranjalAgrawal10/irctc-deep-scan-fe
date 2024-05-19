@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { Card, Button, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -6,7 +6,6 @@ import axios from 'axios';
 export default function TrainCard({train, QuotaCode, DepartureDate}){
 
     const [availCalls, setAvailCalls] = useState({});
-    const [isAvail, setIsAvail] = useState(false);
 
     const handleCheckAvailavility = async (train) => {
         // e.preventDefault();
@@ -26,10 +25,8 @@ export default function TrainCard({train, QuotaCode, DepartureDate}){
                     'Content-Type': 'application/json' 
                 }
             );
-            setIsAvail(true);
             console.log(result.data);
             setAvailCalls(result.data);
-            
         } catch (error) {
             console.error('Error posting data', error);
         }

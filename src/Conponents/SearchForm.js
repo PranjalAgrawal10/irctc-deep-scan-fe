@@ -7,12 +7,13 @@ import DisplaySearch from './DisplaySearch';
 
 export default function SearchForm() {
 
-    const StationOptions = [
+    const [StationOptions, setStationOptions ] = useState([
         { value: 'BPL', label: 'Bhopal JN - BPL' },
         { value: 'PUNE', label: 'PUNE JN - PUNE' },
         { value: 'NSDL', label: 'New Delhi - NSDL' },
         { value: 'INDB', label: 'Indore JN BG - INDB' }
-    ]
+    ]);
+
     const QuotaOptions = [
         { value: 'GN', label: 'General' },
         { value: 'TQ', label: 'Tatkal' }
@@ -29,12 +30,33 @@ export default function SearchForm() {
 
 
 
+    async function handelOnInputChange(inp) {
+
+        // console.log(inp);
+        if(inp.length % 3 === 0 || inp.length === 1){
+            try {
+                const result = await axios.post(
+                    'https://localhost:7295/Station',  
+                    {
+                        Name : inp
+                    }, 
+                    { 
+                        'accept': 'text/plain',  
+                        'Content-Type': 'application/json' 
+                    }
+                );
+    
+                console.log(result.data)
+                setStationOptions(result.data);
+                console.log(result.data)
+            } catch (error) {
+                console.error('Error posting data', error);
+            }
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // console.log({                    SrcStn : fromCode.value,
-        //     DestStn : ToCode.value,
-        //     JrnyDate : DepartureDate,
-        //     QuotaCode : QuotaCode.value})
         try {
             const result = await axios.post(
                 'https://localhost:7295/IrctcSearch',  
@@ -70,7 +92,7 @@ export default function SearchForm() {
                     {
                         isSearchPage ? 
                         <Row className='d-flex flex-row' md={5} sm={5} lg={5}>
-                            <FromTo fromCode={fromCode} ToCode={ToCode} StationOptions={StationOptions} setfromCode={setfromCode} setToCode={setToCode}/>
+                            <FromTo fromCode={fromCode} ToCode={ToCode} StationOptions={StationOptions} setfromCode={setfromCode} handelOnInputChange={handelOnInputChange} setToCode={setToCode}/>
                             <DateQuota DepartureDate={DepartureDate} setDepartureDate={setDepartureDate} QuotaCode={QuotaCode} QuotaOptions={QuotaOptions} setQuotaCode={setQuotaCode}/>
                             <div className='d-flex flex-column'>
                                 <Form.Label>  &nbsp; </Form.Label>
@@ -79,7 +101,7 @@ export default function SearchForm() {
                         </Row> :
                         <div>
                             <Row xs={2} sm={6} md={12} lg={16} className="justify-content-center my-3" style={{width:"100%"}}>
-                                <FromTo fromCode={fromCode} ToCode={ToCode} StationOptions={StationOptions} setfromCode={setfromCode} setToCode={setToCode}/>
+                                <FromTo fromCode={fromCode} ToCode={ToCode} StationOptions={StationOptions} setfromCode={setfromCode} handelOnInputChange={handelOnInputChange} setToCode={setToCode}/>
                             </Row >
                             <Row xs={2} sm={6} md={12} lg={16} style={{width:"100%"}} className="justify-content-center my-3">
                                 <DateQuota DepartureDate={DepartureDate} setDepartureDate={setDepartureDate} QuotaCode={QuotaCode} QuotaOptions={QuotaOptions} setQuotaCode={setQuotaCode}/>
@@ -98,16 +120,18 @@ export default function SearchForm() {
 }
 
 
-function FromTo({fromCode, ToCode, StationOptions, setfromCode, setToCode}){
+function FromTo({fromCode, ToCode, StationOptions, setfromCode, handelOnInputChange, setToCode}){
+
+
     return( 
         <>
             <Col>
                 <Form.Label> From </Form.Label>
-                <Select defaultValue={fromCode} options={StationOptions} id="from-station"  onChange={(e) => (setfromCode(e))}/>
+                <Select defaultValue={fromCode} options={StationOptions} id="from-station" onInputChange={(inp) => {handelOnInputChange(inp)}} onChange={(e) => (setfromCode(e))}/>
             </Col>
             <Col>
                 <Form.Label> To </Form.Label>
-                <Select defaultValue={ToCode}  options={StationOptions} id="to-station" onChange={(e) => (setToCode(e))}/>
+                <Select defaultValue={ToCode}  options={StationOptions} id="to-station" onInputChange={(inp) => {handelOnInputChange(inp)}} onChange={(e) => (setToCode(e))}/>
             </Col>
         </>
     )
