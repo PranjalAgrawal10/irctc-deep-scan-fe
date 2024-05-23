@@ -7,9 +7,13 @@ import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner'
 import Select from 'react-select';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
 
 
-export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
+
+export default function TrainCard({ train, QuotaCode, DepartureDate}){
 
     const [availCalls, setAvailCalls] = useState({});
     const [displayLoding, setDisplayLoding] = useState(false)
@@ -17,15 +21,17 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
     const [routeList, setRouteList] = useState({});
     const [isDisplayRoute, setIsDisplayRoute] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
-
+    
+    const [displayDeepScanButton, setDisplayDeepScanButton] = useState(true);
 
 
 
     const handleChange = (selected) => {
-        if(selectedOptions.length < 10){
+
+        if(selected.length < 11){
             setSelectedOptions(selected);
         }else{
-            console.log("selection not allowed")
+            toast.error("You can select up to 10 options only.");
         }
       };
     
@@ -39,6 +45,7 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
 
     const handleCheckAvailavility = async (train) => {
         // e.preventDefault();
+
         try{
             setDisplayLoding(true);
             setAvailRequested(true);
@@ -57,11 +64,10 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
                     'Content-Type': 'application/json' 
                 }
             );
-            console.log(result.data);
             setDisplayLoding(false);
             setAvailCalls(result.data);
         } catch (error) {
-            setAvailRequested(true)
+            setAvailRequested(false)
             setDisplayLoding(false)
             console.error('Error posting data', error);
         }
@@ -76,9 +82,6 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
         try{
             const d = new Date(DepartureDate);
             const dString = d.toISOString().split('T')[0].replace(`-`, ``).replace(`-`, ``);
-
-            console.log(dString.replace(`-`, ``).replace(`-`, ``))
-
             setShowModal(true)
             setIsDisplayRoute(false)
             const result = await axios.get(
@@ -90,14 +93,15 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
                 }
             );
             setIsDisplayRoute(true);
-            // console.log(result.data);
 
+            // todo: calculate and append date and time
             var betweenStations = [];
             for(var i = 0; i < result.data.stationList.length; i++){
-                betweenStations.push({ value: result.data.stationList[i].stationCode, label:result.data.stationList[i].stationName })
+                betweenStations.push({ value: {
+                    index: i,
+                    stationCode: result.data.stationList[i].stationCode
+                }, label: `${result.data.stationList[i].stationName} (${result.data.stationList[i].stationCode}) - ${result.data.stationList[i].departureTime}` })
             }
-            console.log(betweenStations);
-
             setRouteList(betweenStations);
 
         }catch(e){
@@ -106,26 +110,41 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
     }
 
     return(
-        <Card key={key} className='my-2'>
+        <Card className='my-2'>
             <Card.Header>{train.trainNumber} - {train.trainName}</Card.Header>
-            <Card.Body className='d-flex justify-content-between' >
-                <Card.Text className='my-auto'>
+            <Card.Body className='d-flex flex-column flex-lg-row flex-md-column flex-sm-column justify-content-between' >
+                <Card.Text className='my-lg-auto my-md-2 my-sm-2 my-xs-2 text-center '>
                     {train.fromStnCode} | {train.departureTime} ------{train.duration}------ &nbsp;
                     {train.toStnCode}  | {train.arrivalTime}
                 </Card.Text>
-                <Card.Text className='my-auto'>
+                <Card.Text className='my-lg-auto my-md-2 my-sm-2 my-xs-2 d-flex justify-content-center'>
                     <Row>
                         {train.avlClasses.map((cl) =>(
-                            availCalls[cl] == null ? <Col><Row> {cl} </Row></Col> : 
-                            <AvailablityStatus key={cl} cl={cl} status={availCalls[cl].avlDayList[0].availablityStatus} availablityType={availCalls[cl].avlDayList[0].availablityType} />
+                            availCalls[cl] == null ? <Col key={train.trainNumber+""+cl}><Row> {cl} </Row></Col> : 
+                            <AvailablityStatus 
+                                key={train.trainNumber+""+cl} 
+                                cl={cl} 
+                                status={availCalls[cl].avlDayList[0].availablityStatus} 
+                                availablityType={availCalls[cl].avlDayList[0].availablityType} 
+                                setDisplayDeepScanButton={setDisplayDeepScanButton}
+                            />
                         ))}
                     </Row>        
                 </Card.Text>
-                <div className='my-auto'>
+                <div className='my-lg-auto my-md-2 my-sm-2 my-xs-2 d-flex justify-content-between '>
+                    <div></div>
+                    <div>
+                    <ButtonGroup  >
                     <Button variant={AvailRequested ? "secondary" : "primary" } onClick={ () => (handleCheckAvailavility(train))} disabled={AvailRequested} >
                         {displayLoding ? <LoadingSpinner/> : "Check Availability"}
                     </Button>
-                    <Button variant="danger" onClick={() => DisplayRoutes(train)}>Deep Search</Button>
+                    <Button variant="danger" onClick={() => DisplayRoutes(train)} disabled={!displayDeepScanButton}>Deep Search</Button>
+
+                    </ButtonGroup >
+
+                    </div>
+                    
+                    
                 </div>
 
                 <Modal show={showModal} onHide={handleClose} animation={false} style={{maxHeight: "80vh"}}>
@@ -146,7 +165,6 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
                             {isDisplayRoute ? 
                                 <Select
                                     isMulti
-                                    key={key}
                                     closeMenuOnSelect={false}
                                     value={selectedOptions}
                                     onChange={handleChange}
@@ -156,6 +174,7 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
                             
                         </Col>
                     </Row>
+                    <ToastContainer />
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="danger" onClick={handleClose}>
@@ -169,7 +188,7 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
 }
 
 
-function AvailablityStatus({key, cl, status, availablityType}){
+function AvailablityStatus({cl, status, availablityType, setDisplayDeepScanButton}){
 
     var seatStatus = "";
     var number = ""
@@ -180,10 +199,12 @@ function AvailablityStatus({key, cl, status, availablityType}){
         statusStyle += " bg-danger"
         seatStatus = status
         number = "";
+        setDisplayDeepScanButton(false);
     }else if(availablityType=== '1'){
         statusStyle += " bg-success"
         seatStatus = "AVAILABLE"
         number = status.split("-")[1];
+        setDisplayDeepScanButton(false);
     }else if(availablityType=== '2'){
         statusStyle += " bg-info"
         seatStatus = "RAC";

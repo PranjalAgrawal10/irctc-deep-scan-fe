@@ -9,8 +9,8 @@ export function DisplaySearch({trainInfo, QuotaCode, DepartureDate, displayLodin
         <Container >
             {displayLoding ? <LoadingSpinner/> : <></>}
             { isSearchPage ? 
-                trainInfo.trainBtwnStnsList.map( (train) => (
-                    <TrainCard key={train.trainNumber} train={train} QuotaCode={QuotaCode} DepartureDate={DepartureDate} isNewRequest={true}/>
+                trainInfo.trainBtwnStnsList.map( (train, index) => (
+                    <TrainCard key={train.trainNumber + "" + index} train={train} QuotaCode={QuotaCode} DepartureDate={DepartureDate} isNewRequest={true}/>
                 )) :
                 <></>
             }  

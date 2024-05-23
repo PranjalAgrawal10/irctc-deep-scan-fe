@@ -35,7 +35,6 @@ export default function SearchForm() {
 
     async function handelOnInputChange(inp) {
 
-        // console.log(inp);
         if(inp.length % 3 === 0 || inp.length === 1){
             try {
                 const result = await axios.post(
@@ -49,9 +48,7 @@ export default function SearchForm() {
                     }
                 );
     
-                console.log(result.data)
                 setStationOptions(result.data);
-                console.log(result.data)
             } catch (error) {
                 console.error('Error posting data', error);
             }
@@ -85,7 +82,6 @@ export default function SearchForm() {
             setResponse(result.data);
             setIsSearchPage(true);
             setDisplayLoding(false);
-            // console.log(result.data)
         } catch (error) {
             setDisplayLoding(false);
             console.error('Error posting data', error);
