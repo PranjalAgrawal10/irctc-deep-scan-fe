@@ -37,11 +37,9 @@ export default function SearchForm() {
 
         if(inp.length % 3 === 0 || inp.length === 1){
             try {
-                const result = await axios.post(
-                    'https://localhost:7295/Station',  
-                    {
-                        Name : inp
-                    }, 
+                const result = await axios.get(
+                    `https://localhost:7295/Station?stationRequest=${inp}`,  
+                    "", 
                     { 
                         'accept': 'text/plain',  
                         'Content-Type': 'application/json' 
