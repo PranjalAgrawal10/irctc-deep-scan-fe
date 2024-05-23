@@ -19,7 +19,7 @@ export default function TrainCard({ key, train, QuotaCode, DepartureDate}){
             setDisplayLoding(true);
             setAvailRequested(true);
             const result = await axios.post(
-                'https://localhost:7295/AvailApi',  
+                'https://localhost:7295/AvailApi/Avail',  
                 {
                     QuotaCode : QuotaCode.value,
                     TrainNumber : train.trainNumber,
