@@ -6,7 +6,7 @@ import LoadingSpinner from './LoadingSpinner';
 export function DisplaySearch({trainInfo, QuotaCode, DepartureDate, displayLoding, isSearchPage }){
     
     return(
-        <Container >
+        < >
             {displayLoding ? <LoadingSpinner/> : <></>}
             { isSearchPage ? 
                 trainInfo.trainBtwnStnsList.map( (train, index) => (
@@ -14,7 +14,7 @@ export function DisplaySearch({trainInfo, QuotaCode, DepartureDate, displayLodin
                 )) :
                 <></>
             }  
-        </Container>
+        </>
     )
 }
 

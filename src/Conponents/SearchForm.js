@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
 import Select from "react-select";
 import axios from 'axios';
 import {DisplaySearch} from './DisplaySearch';
@@ -89,11 +90,11 @@ export default function SearchForm() {
 
     return (
         <Container>
-            <Container className='my-2 px-3 pt-2 pb-3 bg-secondary' style={{borderRadius: "5px"}}>
+            <Card className='my-2 px-3 pt-2 pb-3 bg-secondary'>
                 <Form onSubmit={handleSubmit}>
                     {
                         isSearchPage ? 
-                        <Row className='d-flex flex-row' md={5} sm={2} lg={5}>
+                        <Row className='d-flex flex-row' xs={2} sm={2} md={5} lg={5}>
                             <FromTo fromCode={fromCode} ToCode={ToCode} StationOptions={StationOptions} setfromCode={setfromCode} handelOnInputChange={handelOnInputChange} setToCode={setToCode}/>
                             <DateQuota DepartureDate={DepartureDate} setDepartureDate={setDepartureDate} QuotaCode={QuotaCode} QuotaOptions={QuotaOptions} setQuotaCode={setQuotaCode}/>
                             <div className='d-flex flex-column'>
@@ -101,20 +102,20 @@ export default function SearchForm() {
                                 <Button type="submit">Search</Button>
                             </div>
                         </Row> :
-                        <Row>
-                            <Row xs={2} sm={6} md={12} lg={16} className="justify-content-center my-3" style={{width:"100%"}}>
+                        <Row className='justify-content-center'>
+                            <Row xs={2} sm={12} md={12} lg={6} className="justify-content-center my-3" style={{width:"100%"}}>
                                 <FromTo fromCode={fromCode} ToCode={ToCode} StationOptions={StationOptions} setfromCode={setfromCode} handelOnInputChange={handelOnInputChange} setToCode={setToCode}/>
                             </Row >
-                            <Row xs={2} sm={6} md={12} lg={16} style={{width:"100%"}} className="justify-content-center my-3">
+                            <Row xs={2} sm={12} md={12} lg={6} style={{width:"100%"}} className="justify-content-center my-3">
                                 <DateQuota DepartureDate={DepartureDate} setDepartureDate={setDepartureDate} QuotaCode={QuotaCode} QuotaOptions={QuotaOptions} setQuotaCode={setQuotaCode}/>
                             </Row>
-                            <Row xs={1} sm={3} md={6} lg={8} style={{width:"100%"}} className="justify-content-center my-3">
+                            <Row xs={1} sm={3} md={12} lg={6} style={{width:"100%"}} className="justify-content-center my-3">
                                 <Button variant={!displayLoding ? "primary" : "dark"} type="submit" disabled={displayLoding}>Search</Button>
                             </Row>
                         </Row> 
                     }
                 </Form>
-            </Container>
+            </Card>
 
             <DisplaySearch trainInfo={response} QuotaCode={QuotaCode} DepartureDate={DepartureDate} displayLoding={displayLoding} isSearchPage={isSearchPage}/>
             

@@ -52,12 +52,12 @@ export default function TrainCard({ train, QuotaCode, DepartureDate}){
             const result = await axios.post(
                 'https://localhost:7295/AvailApi/Avail',  
                 {
-                    QuotaCode : QuotaCode.value,
-                    TrainNumber : train.trainNumber,
-                    FromStnCode : train.fromStnCode,
-                    ToStnCode : train.toStnCode,
-                    JourneyDate : DepartureDate,
-                    ClassCode : train.avlClasses,
+                    quotaCode : QuotaCode.value,
+                    trainNumber : train.trainNumber,
+                    fromStnCode : train.fromStnCode,
+                    toStnCode : train.toStnCode,
+                    journeyDate : DepartureDate,
+                    classCode : train.avlClasses,
                 }, 
                 { 
                     'accept': 'text/plain',  
@@ -192,7 +192,7 @@ function AvailablityStatus({cl, status, availablityType, setDisplayDeepScanButto
 
     var seatStatus = "";
     var number = ""
-    var statusStyle = "mx-1 justify-content-center text-white font-weight-bold"
+    var statusStyle = "m-1 justify-content-center text-white font-weight-bold"
     //availablityType
 //AVAILABLE
     if(availablityType=== '0'){
