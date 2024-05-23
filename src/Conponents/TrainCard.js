@@ -199,7 +199,6 @@ function AvailablityStatus({cl, status, availablityType, setDisplayDeepScanButto
         statusStyle += " bg-danger"
         seatStatus = status
         number = "";
-        setDisplayDeepScanButton(false);
     }else if(availablityType=== '1'){
         statusStyle += " bg-success"
         seatStatus = "AVAILABLE"
