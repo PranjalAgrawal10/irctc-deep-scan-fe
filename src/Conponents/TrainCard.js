@@ -3,44 +3,30 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Modal from 'react-bootstrap/Modal';
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner'
-import Select from 'react-select';
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import DeepScanGraph from './DeepScanGraph';
+
+import DeepScan from './DeepScan';
 
 
-
-export default function TrainCard({ train, QuotaCode, DepartureDate}){
+export default function TrainCard({ train}){
 
     const [availCalls, setAvailCalls] = useState({});
     const [displayLoding, setDisplayLoding] = useState(false)
     const [AvailRequested, setAvailRequested] = useState(false)
     const [routeList, setRouteList] = useState({});
-    const [isDisplayRoute, setIsDisplayRoute] = useState(false);
-    const [selectedOptions, setSelectedOptions] = useState([]);
-    
-    const [displayDeepScanButton, setDisplayDeepScanButton] = useState(true);
-
-
-
-    const handleChange = (selected) => {
-
-        if(selected.length < 11){
-            setSelectedOptions(selected);
-        }else{
-            toast.error("You can select up to 10 options only.");
-        }
-      };
-    
-
-
     const [showModal, setShowModal] = useState(false);
+    const [isDisplayRoute, setIsDisplayRoute] = useState(false);
+    const [displayDeepScanButton, setDisplayDeepScanButton] = useState(true);
+    const [showDeepScan, setShowDeepScan] = useState(false);
+
+    const [deepScanResponse, setDeepScanResponse] = useState({});
+
 
     const handleClose = () => setShowModal(false);
-
 
 
     const handleCheckAvailavility = async (train) => {
@@ -50,13 +36,13 @@ export default function TrainCard({ train, QuotaCode, DepartureDate}){
             setDisplayLoding(true);
             setAvailRequested(true);
             const result = await axios.post(
-                'https://localhost:7295/AvailApi/Avail',  
+                'https://localhost:44328/AvailApi/Avail',  
                 {
-                    quotaCode : QuotaCode.value,
+                    quotaCode : train.quotaCode,
                     trainNumber : train.trainNumber,
                     fromStnCode : train.fromStnCode,
                     toStnCode : train.toStnCode,
-                    journeyDate : DepartureDate,
+                    journeyDate : train.DepartureDate,
                     classCode : train.avlClasses,
                 }, 
                 { 
@@ -80,12 +66,12 @@ export default function TrainCard({ train, QuotaCode, DepartureDate}){
             return;
         }
         try{
-            const d = new Date(DepartureDate);
+            const d = new Date(train.DepartureDate);
             const dString = d.toISOString().split('T')[0].replace(`-`, ``).replace(`-`, ``);
             setShowModal(true)
             setIsDisplayRoute(false)
             const result = await axios.get(
-                `https://localhost:7295/AvailApi/GetStations?TrainNumber=${train.trainNumber}&JourneyDate=${dString}&FromStnCode=${train.fromStnCode}`,  
+                `https://localhost:44328/AvailApi/GetStations?TrainNumber=${train.trainNumber}&JourneyDate=${dString}&FromStnCode=${train.fromStnCode}`,  
                 "", 
                 { 
                     'accept': 'text/plain',  
@@ -98,9 +84,9 @@ export default function TrainCard({ train, QuotaCode, DepartureDate}){
             var betweenStations = [];
             for(var i = 0; i < result.data.stationList.length; i++){
                 betweenStations.push({ value: {
-                    index: i,
+                    index: parseInt(result.data.stationList[i].stnSerialNumber),
                     stationCode: result.data.stationList[i].stationCode
-                }, label: `${result.data.stationList[i].stationName} (${result.data.stationList[i].stationCode}) - ${result.data.stationList[i].departureTime}` })
+                }, label: `${result.data.stationList[i].stationName} (${result.data.stationList[i].stationCode}) - ${result.data.stationList[i].arrivalTime}` })
             }
             setRouteList(betweenStations);
 
@@ -147,42 +133,20 @@ export default function TrainCard({ train, QuotaCode, DepartureDate}){
                     
                 </div>
 
-                <Modal show={showModal} onHide={handleClose} animation={false} style={{maxHeight: "80vh"}}>
-                    <Modal.Header closeButton>
-                        <Modal.Title className='text-center'>Select 10 stations on which you can change seats.</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                    <Row className="justify-content-md-center">
-                        <Col>
-                            <Row className='justify-content-between'>
-                                <Col>
-                                    Select Stations
-                                </Col>
-                                <Col className='text-end'>
-                                    Selection Left {10 - (selectedOptions.length)}
-                                </Col>
-                            </Row>
-                            {isDisplayRoute ? 
-                                <Select
-                                    isMulti
-                                    closeMenuOnSelect={false}
-                                    value={selectedOptions}
-                                    onChange={handleChange}
-                                    options={routeList}
-                                />:
-                                <LoadingSpinner />}
-                            
-                        </Col>
-                    </Row>
-                    <ToastContainer />
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="danger" onClick={handleClose}>
-                            Deep Scan
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                <DeepScan 
+                    key={train.trainNumber} 
+                    train={train} 
+                    showModal={showModal} 
+                    isDisplayRoute={isDisplayRoute} 
+                    routeList={routeList} 
+                    handleClose={handleClose} 
+                    setDeepScanResponse={setDeepScanResponse}
+                    setShowDeepScan={setShowDeepScan}
+                />
+                
             </Card.Body>
+
+            {showDeepScan ? <DeepScanGraph deepScanResponse={deepScanResponse} /> : <></>}
         </Card>
     )
 }

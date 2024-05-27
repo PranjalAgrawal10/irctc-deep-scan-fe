@@ -1,6 +1,5 @@
 import React from 'react';
 import TrainCard from './TrainCard';
-import Container from 'react-bootstrap/Container';
 import LoadingSpinner from './LoadingSpinner';
 
 export function DisplaySearch({trainInfo, QuotaCode, DepartureDate, displayLoding, isSearchPage }){
@@ -9,9 +8,12 @@ export function DisplaySearch({trainInfo, QuotaCode, DepartureDate, displayLodin
         < >
             {displayLoding ? <LoadingSpinner/> : <></>}
             { isSearchPage ? 
-                trainInfo.trainBtwnStnsList.map( (train, index) => (
-                    <TrainCard key={train.trainNumber + "" + index} train={train} QuotaCode={QuotaCode} DepartureDate={DepartureDate} isNewRequest={true}/>
-                )) :
+                trainInfo.trainBtwnStnsList.map( (train, index) => {
+                    train.DepartureDate = DepartureDate;
+                    train.quotaCode = QuotaCode.value;
+                    return (
+                    <TrainCard key={train.trainNumber + "" + index} train={train} isNewRequest={true}/>
+                )}) :
                 <></>
             }  
         </>

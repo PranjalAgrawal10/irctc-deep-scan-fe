@@ -39,7 +39,7 @@ export default function SearchForm() {
         if(inp.length % 3 === 0 || inp.length === 1){
             try {
                 const result = await axios.get(
-                    `https://localhost:7295/Station?stationRequest=${inp}`,  
+                    `https://localhost:44328/Station?stationRequest=${inp}`,  
                     "", 
                     { 
                         'accept': 'text/plain',  
@@ -61,7 +61,7 @@ export default function SearchForm() {
         try {
             setDisplayLoding(true);
             const result = await axios.post(
-                'https://localhost:7295/IrctcSearch',  
+                'https://localhost:44328/IrctcSearch',  
                 {
                     SrcStn : fromCode.value,
                     DestStn : ToCode.value,
