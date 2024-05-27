@@ -8,6 +8,7 @@ import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner'
 import 'react-toastify/dist/ReactToastify.css';
 import DeepScanGraph from './DeepScanGraph';
+import { ToastContainer, toast } from 'react-toastify';
 
 import DeepScan from './DeepScan';
 
@@ -19,9 +20,12 @@ export default function TrainCard({ train}){
     const [AvailRequested, setAvailRequested] = useState(false)
     const [routeList, setRouteList] = useState({});
     const [showModal, setShowModal] = useState(false);
+
+    const [showCount, setShowCount] = useState(false);
     const [isDisplayRoute, setIsDisplayRoute] = useState(false);
     const [displayDeepScanButton, setDisplayDeepScanButton] = useState(true);
     const [showDeepScan, setShowDeepScan] = useState(false);
+    const [disableButton, setDisableButton] = useState(false);
 
     const [deepScanResponse, setDeepScanResponse] = useState({});
 
@@ -95,6 +99,50 @@ export default function TrainCard({ train}){
         }
     }
 
+
+    const deepSearch = async () => {
+        if(!AvailRequested){
+            toast.error("Check Availability First");
+            return;
+        }
+
+
+        try{
+            setDisableButton(true);
+            setDisplayDeepScanButton(false);
+
+            var payload = {
+                quotaCode : train.quotaCode,
+                trainNumber : train.trainNumber,
+                fromStnCode : train.fromStnCode,
+                toStnCode : train.toStnCode,
+                journeyDate : train.DepartureDate,
+                classCode : train.avlClasses,
+            }
+
+            const result = await axios.post(
+                'https://localhost:44328/AvailApi/DeepScan',  
+                payload, 
+                { 
+                    'accept': 'text/plain',  
+                    'Content-Type': 'application/json' 
+                }
+            );
+            
+            handleClose(false);
+            setDeepScanResponse(result.data);
+            setShowDeepScan(true);
+            setDisplayDeepScanButton(false);
+            setAvailRequested(true);
+            setDisableButton(false)
+            console.log(result.data)
+            setShowCount(true);
+        } catch (error) {
+            setDisableButton(true);
+            console.error('Error posting data', error);
+        }
+    }
+
     return(
         <Card className='my-2'>
             <Card.Header>{train.trainNumber} - {train.trainName}</Card.Header>
@@ -124,16 +172,20 @@ export default function TrainCard({ train}){
                     <Button variant={AvailRequested ? "secondary" : "primary" } onClick={ () => (handleCheckAvailavility(train))} disabled={AvailRequested} >
                         {displayLoding ? <LoadingSpinner/> : "Check Availability"}
                     </Button>
-                    <Button variant="danger" onClick={() => DisplayRoutes(train)} disabled={!displayDeepScanButton}>Deep Search</Button>
-
+                    <Button 
+                        variant="danger" 
+                        onClick={() => deepSearch()} 
+                        disabled={!displayDeepScanButton || disableButton}> 
+                        {disableButton ? <LoadingSpinner/>: "Deep Search"}
+                    </Button>
                     </ButtonGroup >
-
+                    {showCount ? <p>{deepScanResponse.numberOfReQuestsHit} routes checked</p> : <></>}
                     </div>
                     
                     
                 </div>
 
-                <DeepScan 
+                {/* <DeepScan 
                     key={train.trainNumber} 
                     train={train} 
                     showModal={showModal} 
@@ -144,11 +196,14 @@ export default function TrainCard({ train}){
                     setShowDeepScan={setShowDeepScan}
                     setDisplayDeepScanButton={setDisplayDeepScanButton}
                     setAvailRequested={setAvailRequested}
-                />
+                /> */}
                 
             </Card.Body>
 
             {showDeepScan ? <DeepScanGraph deepScanResponse={deepScanResponse} /> : <></>}
+
+            <ToastContainer />
+
         </Card>
     )
 }

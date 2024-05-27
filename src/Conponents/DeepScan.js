@@ -19,24 +19,15 @@ export default function DeepScan({
     const deepSearch = async () => {
         try{
             setDisableButton(true);
-            var stationList = {};
-            
-            for (var key in selectedOptions) {
-                // stationList[selectedOptions[key].value.index] = selectedOptions[key].value.stationCode ;
-                stationList[selectedOptions[key].value.stationCode] = selectedOptions[key].value.index 
-            }
-
+            setDisplayDeepScanButton(false);
 
             var payload = {
-                stationList : stationList,
-                    availRequest : {
-                        quotaCode : train.quotaCode,
-                        trainNumber : train.trainNumber,
-                        fromStnCode : train.fromStnCode,
-                        toStnCode : train.toStnCode,
-                        journeyDate : train.DepartureDate,
-                        classCode : train.avlClasses,
-                    }
+                quotaCode : train.quotaCode,
+                trainNumber : train.trainNumber,
+                fromStnCode : train.fromStnCode,
+                toStnCode : train.toStnCode,
+                journeyDate : train.DepartureDate,
+                classCode : train.avlClasses,
             }
 
             const result = await axios.post(
@@ -107,6 +98,7 @@ export default function DeepScan({
                     { disableButton ? <LoadingSpinner /> : "Deep Scan"}
                 </Button>
             </Modal.Footer>
+            
         </Modal>
     )
 }
