@@ -142,6 +142,8 @@ export default function TrainCard({ train}){
                     handleClose={handleClose} 
                     setDeepScanResponse={setDeepScanResponse}
                     setShowDeepScan={setShowDeepScan}
+                    setDisplayDeepScanButton={setDisplayDeepScanButton}
+                    setAvailRequested={setAvailRequested}
                 />
                 
             </Card.Body>

@@ -9,7 +9,9 @@ import LoadingSpinner from './LoadingSpinner'
 import axios from 'axios';
 
 
-export default function DeepScan({train, showModal, isDisplayRoute, routeList, setDeepScanResponse, handleClose, setShowDeepScan}){
+export default function DeepScan({
+    train, showModal, isDisplayRoute, routeList, setDeepScanResponse, 
+    handleClose, setShowDeepScan, setDisplayDeepScanButton, setAvailRequested}){
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [disableButton, setDisableButton] = useState(false);
 
@@ -37,8 +39,6 @@ export default function DeepScan({train, showModal, isDisplayRoute, routeList, s
                     }
             }
 
-            console.log(payload);
-
             const result = await axios.post(
                 'https://localhost:44328/AvailApi/DeepScan',  
                 payload, 
@@ -47,10 +47,11 @@ export default function DeepScan({train, showModal, isDisplayRoute, routeList, s
                     'Content-Type': 'application/json' 
                 }
             );
-            console.log(result.data)
             handleClose(false);
             setDeepScanResponse(result.data);
             setShowDeepScan(true);
+            setDisplayDeepScanButton(false);
+            setAvailRequested(true);
         } catch (error) {
             setDisableButton(false);
             console.error('Error posting data', error);
